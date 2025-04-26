@@ -16,14 +16,14 @@
 - 后端：FastAPI, Python
 - 前端：HTML, JavaScript, Bootstrap
 - 深度学习：YOLOv8
-- 数据库：SQLite
+- 数据库：Mysql
 - 认证：JWT
 
 ## 安装
 
 1. 克隆仓库：
 ```bash
-git clone https://github.com/your-username/manhole-cover.git
+git clone https://github.com/XTCi/manhole-cover.git
 cd manhole-cover
 ```
 
