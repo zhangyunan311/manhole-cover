@@ -2,15 +2,16 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
-from .core.config import settings
-from .api.endpoints import router
-from .api.qwenvl import router as qwenvl_router
-from .api.user import router as user_router
-from .models.user import User
-from .utils.auth import get_current_user
+from core.config import settings
+from api.endpoints import router
+from api.qwenvl import router as qwenvl_router
+from api.user import router as user_router
+from models.user import User
+from utils.auth import get_current_user
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import os
+
 
 # 创建上传目录
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -31,7 +32,7 @@ app.add_middleware(
 )
 
 # 挂载静态文件目录
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory=r"D:\code\manhole-cover\app\static"), name="static")
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
 # 注册路由
@@ -58,3 +59,5 @@ async def protected_video(current_user: User = Depends(get_current_user)):
 @app.get("/static/vision.html")
 async def protected_vision(current_user: User = Depends(get_current_user)):
     return FileResponse("app/static/vision.html")
+
+

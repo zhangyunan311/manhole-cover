@@ -1,9 +1,261 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="zh-CN">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>登录 - 井盖检测系统</title>-->
+<!--    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">-->
+<!--    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--            background-color: #f0f0f0;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            min-height: 100vh;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 400px;-->
+<!--            padding: 20px;-->
+<!--            background-color: white;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+<!--        .form-group {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .error-message {-->
+<!--            color: #dc3545;-->
+<!--            margin-top: 10px;-->
+<!--            display: none;-->
+<!--        }-->
+<!--        .success-message {-->
+<!--            color: #28a745;-->
+<!--            margin-top: 10px;-->
+<!--            display: none;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container">-->
+<!--        <h1 class="text-center mb-4">登录</h1>-->
+
+<!--        <form id="loginForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="username">用户名</label>-->
+<!--                <input type="text" class="form-control" id="username" required>-->
+<!--            </div>-->
+
+<!--            <div class="form-group">-->
+<!--                <label for="password">密码</label>-->
+<!--                <input type="password" class="form-control" id="password" required>-->
+<!--            </div>-->
+
+<!--            <div class="error-message" id="errorMessage"></div>-->
+<!--            <div class="success-message" id="successMessage"></div>-->
+
+<!--            <button type="submit" class="btn btn-primary w-100 mb-3">登录</button>-->
+<!--            <a href="/static/register.html" class="btn btn-outline-secondary w-100">注册新账号</a>-->
+<!--        </form>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        document.getElementById('loginForm').addEventListener('submit', async function(e) {-->
+<!--            e.preventDefault();-->
+
+<!--            const username = document.getElementById('username').value;-->
+<!--            const password = document.getElementById('password').value;-->
+<!--            const errorMessage = document.getElementById('errorMessage');-->
+<!--            const successMessage = document.getElementById('successMessage');-->
+
+<!--            try {-->
+<!--                const formData = new FormData();-->
+<!--                formData.append('username', username);-->
+<!--                formData.append('password', password);-->
+
+<!--                const response = await fetch('/api/v1/token', {-->
+<!--                    method: 'POST',-->
+<!--                    body: formData-->
+<!--                });-->
+
+<!--                if (!response.ok) {-->
+<!--                    throw new Error('登录失败，请检查用户名和密码');-->
+<!--                }-->
+
+<!--                const data = await response.json();-->
+
+<!--                // 保存token到localStorage-->
+<!--                localStorage.setItem('token', data.access_token);-->
+
+<!--                // 显示成功消息-->
+<!--                successMessage.textContent = '登录成功，正在跳转...';-->
+<!--                successMessage.style.display = 'block';-->
+<!--                errorMessage.style.display = 'none';-->
+
+<!--                // 跳转到首页-->
+<!--                setTimeout(() => {-->
+<!--                    window.location.href = '/static/index.html';-->
+<!--                }, 1000);-->
+
+<!--            } catch (error) {-->
+<!--                errorMessage.textContent = error.message;-->
+<!--                errorMessage.style.display = 'block';-->
+<!--                successMessage.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="zh-CN">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>登录 - 街道井盖隐患监测系统</title>-->
+<!--    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">-->
+<!--    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--            padding-top: 80px;-->
+<!--            background-color: #f0f0f0;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            min-height: 100vh;-->
+<!--            position: relative;-->
+<!--        }-->
+<!--        .system-title {-->
+<!--            position: absolute;-->
+<!--            top: 100px;-->
+<!--            left: 50%;-->
+<!--            transform: translateX(-50%);-->
+<!--            text-align: center;-->
+<!--            width: 100%;-->
+<!--            max-width: 4000px;-->
+<!--            color: #2c3e50;-->
+<!--            font-size: 4rem;-->
+<!--            font-weight: bold;-->
+<!--            margin-bottom: 30px;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 400px;-->
+<!--            padding: 20px;-->
+<!--            background-color: white;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+<!--        .form-group {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .error-message {-->
+<!--            color: #dc3545;-->
+<!--            margin-top: 10px;-->
+<!--            display: none;-->
+<!--        }-->
+<!--        .success-message {-->
+<!--            color: #28a745;-->
+<!--            margin-top: 10px;-->
+<!--            display: none;-->
+<!--        }-->
+<!--        .title {-->
+<!--            font-size: 24px;-->
+<!--            font-weight: bold;-->
+<!--            margin-bottom: 30px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--    <div class="system-title">-->
+<!--        街道井盖隐患监测系统-->
+<!--    </div>-->
+
+<!--    <div class="container">-->
+
+<!--        <h1 class="text-center mb-4">登录</h1>-->
+
+<!--        <form id="loginForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="username">用户名</label>-->
+<!--                <input type="text" class="form-control" id="username" required>-->
+<!--            </div>-->
+
+<!--            <div class="form-group">-->
+<!--                <label for="password">密码</label>-->
+<!--                <input type="password" class="form-control" id="password" required>-->
+<!--            </div>-->
+
+<!--            <div class="error-message" id="errorMessage"></div>-->
+<!--            <div class="success-message" id="successMessage"></div>-->
+
+<!--            <button type="submit" class="btn btn-primary w-100 mb-3">登录</button>-->
+<!--            <a href="/static/register.html" class="btn btn-outline-secondary w-100">注册新账号</a>-->
+<!--        </form>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        document.getElementById('loginForm').addEventListener('submit', async function(e) {-->
+<!--            e.preventDefault();-->
+
+<!--            const username = document.getElementById('username').value;-->
+<!--            const password = document.getElementById('password').value;-->
+<!--            const errorMessage = document.getElementById('errorMessage');-->
+<!--            const successMessage = document.getElementById('successMessage');-->
+
+<!--            try {-->
+<!--                const formData = new FormData();-->
+<!--                formData.append('username', username);-->
+<!--                formData.append('password', password);-->
+
+<!--                const response = await fetch('/api/v1/token', {-->
+<!--                    method: 'POST',-->
+<!--                    body: formData-->
+<!--                });-->
+
+<!--                if (!response.ok) {-->
+<!--                    throw new Error('登录失败，请检查用户名和密码');-->
+<!--                }-->
+
+<!--                const data = await response.json();-->
+
+<!--                // 保存token到localStorage-->
+<!--                localStorage.setItem('token', data.access_token);-->
+
+<!--                // 显示成功消息-->
+<!--                successMessage.textContent = '登录成功，正在跳转...';-->
+<!--                successMessage.style.display = 'block';-->
+<!--                errorMessage.style.display = 'none';-->
+
+<!--                // 跳转到首页-->
+<!--                setTimeout(() => {-->
+<!--                    window.location.href = '/static/index.html';-->
+<!--                }, 1000);-->
+
+<!--            } catch (error) {-->
+<!--                errorMessage.textContent = error.message;-->
+<!--                errorMessage.style.display = 'block';-->
+<!--                successMessage.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - 井盖检测系统</title>
+    <title>登录 - 街道井盖隐患监测系统</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,52 +264,103 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
+            padding-top: 80px;
             background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            position: relative;
+            /* 新增背景图样式 */
+            background-image: url('/static/images/login-bg.jpg'); /* 背景图片路径 */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+            background-color: rgba(240, 240, 240, 0.8);
         }
+
+        /* 新增半透明遮罩层 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+
+        .system-title {
+            position: absolute;
+            top: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            width: 100%;
+            max-width: 4000px;
+            color: #2c3e50;
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+
         .container {
             max-width: 400px;
-            padding: 20px;
+            padding: 30px;
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(2px);
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .error-message {
             color: #dc3545;
             margin-top: 10px;
             display: none;
         }
+
         .success-message {
             color: #28a745;
             margin-top: 10px;
             display: none;
         }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
+    <div class="system-title">
+        街道井盖隐患监测系统
+    </div>
+
     <div class="container">
         <h1 class="text-center mb-4">登录</h1>
-        
+
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">用户名</label>
                 <input type="text" class="form-control" id="username" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="password">密码</label>
                 <input type="password" class="form-control" id="password" required>
             </div>
-            
+
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage"></div>
-            
+
             <button type="submit" class="btn btn-primary w-100 mb-3">登录</button>
             <a href="/static/register.html" class="btn btn-outline-secondary w-100">注册新账号</a>
         </form>
@@ -66,41 +369,42 @@
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
-            
+
             try {
                 const formData = new FormData();
                 formData.append('username', username);
                 formData.append('password', password);
-                
+
                 const response = await fetch('/api/v1/token', {
                     method: 'POST',
                     body: formData
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('登录失败，请检查用户名和密码');
                 }
-                
+
                 const data = await response.json();
-                
-                // 保存token到localStorage
+
+                // 保存token和用户名到localStorage
                 localStorage.setItem('token', data.access_token);
-                
+                localStorage.setItem('username', username);
+
                 // 显示成功消息
                 successMessage.textContent = '登录成功，正在跳转...';
                 successMessage.style.display = 'block';
                 errorMessage.style.display = 'none';
-                
+
                 // 跳转到首页
                 setTimeout(() => {
                     window.location.href = '/static/index.html';
                 }, 1000);
-                
+
             } catch (error) {
                 errorMessage.textContent = error.message;
                 errorMessage.style.display = 'block';
@@ -109,4 +413,4 @@
         });
     </script>
 </body>
-</html> 
+</html>

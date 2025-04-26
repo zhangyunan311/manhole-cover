@@ -7,9 +7,9 @@ import json
 import asyncio
 import cv2
 import base64
-from ..core.config import settings
-from ..core.yolo_detector import YOLODetector
-from ..schemas.detection import DetectionSettings, ImageDetectionResponse
+from app.core.config import settings
+from app.core.yolo_detector import YOLODetector
+from app.schemas.detection import DetectionSettings, ImageDetectionResponse
 
 router = APIRouter()
 detector = YOLODetector()

@@ -1,13 +1,645 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="zh-CN">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>街道井盖隐患监测系统</title>-->
+<!--    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">-->
+<!--    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <style>-->
+<!--        .preview-image {-->
+<!--            max-width: 100%;-->
+<!--            max-height: 300px;-->
+<!--            margin: 10px 0;-->
+<!--        }-->
+<!--        .result-container {-->
+<!--            margin-top: 20px;-->
+<!--        }-->
+<!--        .loading {-->
+<!--            display: none;-->
+<!--            text-align: center;-->
+<!--            margin: 20px 0;-->
+<!--        }-->
+<!--        .detection-box {-->
+<!--            border: 2px solid red;-->
+<!--            position: absolute;-->
+<!--            pointer-events: none;-->
+<!--        }-->
+<!--        .image-container {-->
+<!--            position: relative;-->
+<!--            display: inline-block;-->
+<!--        }-->
+<!--        .detection-info {-->
+<!--            margin-top: 10px;-->
+<!--            font-size: 0.9em;-->
+<!--        }-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--            background-color: #f0f0f0;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 1200px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 20px;-->
+<!--            background-color: white;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+<!--        .video-container {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .video-box {-->
+<!--            flex: 1;-->
+<!--            margin: 10px;-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        video {-->
+<!--            width: 100%;-->
+<!--            max-width: 640px;-->
+<!--            border-radius: 5px;-->
+<!--            background-color: #000;-->
+<!--        }-->
+<!--        .controls {-->
+<!--            margin: 20px 0;-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        button {-->
+<!--            padding: 10px 20px;-->
+<!--            margin: 0 10px;-->
+<!--            font-size: 16px;-->
+<!--            border: none;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--            background-color: #4CAF50;-->
+<!--            color: white;-->
+<!--            transition: background-color 0.3s;-->
+<!--        }-->
+<!--        button:hover {-->
+<!--            background-color: #45a049;-->
+<!--        }-->
+<!--        button:disabled {-->
+<!--            background-color: #cccccc;-->
+<!--            cursor: not-allowed; -->
+<!--        }-->
+<!--        .status {-->
+<!--            text-align: center;-->
+<!--            margin: 10px 0;-->
+<!--            padding: 10px;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+<!--        .status.connected {-->
+<!--            background-color: #dff0d8;-->
+<!--            color: #3c763d;-->
+<!--        }-->
+<!--        .status.disconnected {-->
+<!--            background-color: #f2dede;-->
+<!--            color: #a94442;-->
+<!--        }-->
+<!--        .detection-stats {-->
+<!--            margin-top: 10px;-->
+<!--            padding: 10px;-->
+<!--            background-color: #f8f9fa;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+<!--        .detection-item {-->
+<!--            margin: 5px 0;-->
+<!--            padding: 5px;-->
+<!--            border-bottom: 1px solid #eee;-->
+<!--        }-->
+<!--        .detection-item:last-child {-->
+<!--            border-bottom: none;-->
+<!--        }-->
+<!--        .tabs {-->
+<!--            display: flex;-->
+<!--            margin-bottom: 20px;-->
+<!--            border-bottom: 1px solid #ddd;-->
+<!--        }-->
+<!--        .tab {-->
+<!--            padding: 10px 20px;-->
+<!--            cursor: pointer;-->
+<!--            border: 1px solid transparent;-->
+<!--            border-bottom: none;-->
+<!--            border-radius: 5px 5px 0 0;-->
+<!--            margin-right: 5px;-->
+<!--        }-->
+<!--        .tab.active {-->
+<!--            background-color: #fff;-->
+<!--            border-color: #ddd;-->
+<!--            border-bottom: 1px solid #fff;-->
+<!--            margin-bottom: -1px;-->
+<!--        }-->
+<!--        .tab-content {-->
+<!--            display: none;-->
+<!--        }-->
+<!--        .tab-content.active {-->
+<!--            display: block;-->
+<!--        }-->
+<!--        .feature-card {-->
+<!--            height: 100%;-->
+<!--            transition: transform 0.3s;-->
+<!--        }-->
+<!--        .feature-card:hover {-->
+<!--            transform: translateY(-5px);-->
+<!--        }-->
+<!--        .feature-icon {-->
+<!--            font-size: 3rem;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+<!--        .auth-buttons {-->
+<!--            position: absolute;-->
+<!--            top: 20px;-->
+<!--            right: 20px;-->
+<!--            display: flex;-->
+<!--            gap: 10px;-->
+<!--        }-->
+<!--        -->
+<!--        .user-info {-->
+<!--            position: absolute;-->
+<!--            top: 20px;-->
+<!--            right: 20px;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 10px;-->
+<!--        }-->
+<!--        -->
+<!--        .welcome-message {-->
+<!--            color: #333;-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash;    <div class="auth-buttons" id="authButtons">&ndash;&gt;-->
+<!--&lt;!&ndash;        <a href="/static/login.html" class="btn btn-outline-primary">登录</a>&ndash;&gt;-->
+<!--&lt;!&ndash;        <a href="/static/register.html" class="btn btn-primary">注册</a>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    &ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="user-info" id="userInfo" style="display: none;">&ndash;&gt;-->
+<!--&lt;!&ndash;        <span class="welcome-message" id="welcomeMessage"></span>&ndash;&gt;-->
+<!--&lt;!&ndash;        <button class="btn btn-outline-danger" onclick="logout()">退出登录</button>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+
+<!--    <div class="container mt-5">-->
+<!--        <h1 class="text-center mb-5">街道井盖隐患监测系统</h1>-->
+<!--        -->
+<!--        <div class="row g-4">-->
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">📹</div>-->
+<!--                        <h5 class="card-title">实时检测</h5>-->
+<!--                        <p class="card-text">通过摄像头实时检测井盖状态</p>-->
+<!--                        <a href="/static/realtime.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            -->
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">🖼️</div>-->
+<!--                        <h5 class="card-title">图片检测</h5>-->
+<!--                        <p class="card-text">上传图片进行井盖检测</p>-->
+<!--                        <a href="/static/image.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            -->
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">🎥</div>-->
+<!--                        <h5 class="card-title">视频检测</h5>-->
+<!--                        <p class="card-text">上传视频进行井盖检测</p>-->
+<!--                        <a href="/static/video.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            -->
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">🤖</div>-->
+<!--                        <h5 class="card-title">视觉大模型检测</h5>-->
+<!--                        <p class="card-text">使用大模型进行图像分析</p>-->
+<!--                        <a href="/static/vision.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="zh-CN">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>街道井盖隐患监测系统</title>-->
+<!--    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">-->
+<!--    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">-->
+<!--    <style>-->
+<!--        .preview-image {-->
+<!--            max-width: 100%;-->
+<!--            max-height: 300px;-->
+<!--            margin: 10px 0;-->
+<!--        }-->
+<!--        .result-container {-->
+<!--            margin-top: 20px;-->
+<!--        }-->
+<!--        .loading {-->
+<!--            display: none;-->
+<!--            text-align: center;-->
+<!--            margin: 20px 0;-->
+<!--        }-->
+<!--        .detection-box {-->
+<!--            border: 2px solid red;-->
+<!--            position: absolute;-->
+<!--            pointer-events: none;-->
+<!--        }-->
+<!--        .image-container {-->
+<!--            position: relative;-->
+<!--            display: inline-block;-->
+<!--        }-->
+<!--        .detection-info {-->
+<!--            margin-top: 10px;-->
+<!--            font-size: 0.9em;-->
+<!--        }-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--            background-color: #f0f0f0;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 1200px;-->
+<!--            margin: 0 auto;-->
+<!--            padding: 20px;-->
+<!--            background-color: white;-->
+<!--            border-radius: 10px;-->
+<!--            box-shadow: 0 0 10px rgba(0,0,0,0.1);-->
+<!--        }-->
+<!--        .video-container {-->
+<!--            display: flex;-->
+<!--            justify-content: space-between;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .video-box {-->
+<!--            flex: 1;-->
+<!--            margin: 10px;-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        video {-->
+<!--            width: 100%;-->
+<!--            max-width: 640px;-->
+<!--            border-radius: 5px;-->
+<!--            background-color: #000;-->
+<!--        }-->
+<!--        .controls {-->
+<!--            margin: 20px 0;-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        button {-->
+<!--            padding: 10px 20px;-->
+<!--            margin: 0 10px;-->
+<!--            font-size: 16px;-->
+<!--            border: none;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--            background-color: #4CAF50;-->
+<!--            color: white;-->
+<!--            transition: background-color 0.3s;-->
+<!--        }-->
+<!--        button:hover {-->
+<!--            background-color: #45a049;-->
+<!--        }-->
+<!--        button:disabled {-->
+<!--            background-color: #cccccc;-->
+<!--            cursor: not-allowed;-->
+<!--        }-->
+<!--        .status {-->
+<!--            text-align: center;-->
+<!--            margin: 10px 0;-->
+<!--            padding: 10px;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+<!--        .status.connected {-->
+<!--            background-color: #dff0d8;-->
+<!--            color: #3c763d;-->
+<!--        }-->
+<!--        .status.disconnected {-->
+<!--            background-color: #f2dede;-->
+<!--            color: #a94442;-->
+<!--        }-->
+<!--        .detection-stats {-->
+<!--            margin-top: 10px;-->
+<!--            padding: 10px;-->
+<!--            background-color: #f8f9fa;-->
+<!--            border-radius: 5px;-->
+<!--        }-->
+<!--        .detection-item {-->
+<!--            margin: 5px 0;-->
+<!--            padding: 5px;-->
+<!--            border-bottom: 1px solid #eee;-->
+<!--        }-->
+<!--        .detection-item:last-child {-->
+<!--            border-bottom: none;-->
+<!--        }-->
+<!--        .tabs {-->
+<!--            display: flex;-->
+<!--            margin-bottom: 20px;-->
+<!--            border-bottom: 1px solid #ddd;-->
+<!--        }-->
+<!--        .tab {-->
+<!--            padding: 10px 20px;-->
+<!--            cursor: pointer;-->
+<!--            border: 1px solid transparent;-->
+<!--            border-bottom: none;-->
+<!--            border-radius: 5px 5px 0 0;-->
+<!--            margin-right: 5px;-->
+<!--        }-->
+<!--        .tab.active {-->
+<!--            background-color: #fff;-->
+<!--            border-color: #ddd;-->
+<!--            border-bottom: 1px solid #fff;-->
+<!--            margin-bottom: -1px;-->
+<!--        }-->
+<!--        .tab-content {-->
+<!--            display: none;-->
+<!--        }-->
+<!--        .tab-content.active {-->
+<!--            display: block;-->
+<!--        }-->
+<!--        .feature-card {-->
+<!--            height: 100%;-->
+<!--            transition: transform 0.3s;-->
+<!--        }-->
+<!--        .feature-card:hover {-->
+<!--            transform: translateY(-5px);-->
+<!--        }-->
+<!--        .feature-icon {-->
+<!--            font-size: 3rem;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        /* 新增的用户信息样式 */-->
+<!--        .user-info-container {-->
+<!--            background-color: #e7f5ff;-->
+<!--            padding: 10px 15px;-->
+<!--            border-radius: 20px;-->
+<!--            display: inline-flex;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .user-avatar {-->
+<!--            width: 30px;-->
+<!--            height: 30px;-->
+<!--            background-color: #4dabf7;-->
+<!--            color: white;-->
+<!--            border-radius: 50%;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+<!--        .welcome-text {-->
+<!--            margin-right: 15px;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+<!--        .logout-btn {-->
+<!--            background-color: #ff6b6b;-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 5px 10px;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color 0.2s;-->
+<!--            text-decoration: none;-->
+<!--            font-size: 14px;-->
+<!--        }-->
+<!--        .logout-btn:hover {-->
+<!--            background-color: #fa5252;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container mt-5">-->
+<!--        <h1 class="text-center mb-3">街道井盖隐患监测系统</h1>-->
+
+<!--        &lt;!&ndash; 新增的用户信息模块 &ndash;&gt;-->
+<!--        <div class="d-flex justify-content-center">-->
+<!--            <div class="user-info-container">-->
+<!--                <div class="user-avatar">-->
+<!--                    <i class="bi bi-person-fill"></i>-->
+<!--                </div>-->
+<!--                <span class="welcome-text">欢迎，{{ session['username'] }}！</span>-->
+<!--                <a href="/static/login.html" class="logout-btn">-->
+<!--                    <i class="bi bi-box-arrow-right"></i> 退出登录-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        <div class="row g-4">-->
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">📹</div>-->
+<!--                        <h5 class="card-title">实时检测</h5>-->
+<!--                        <p class="card-text">通过摄像头实时检测井盖状态</p>-->
+<!--                        <a href="/static/realtime.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">🖼️</div>-->
+<!--                        <h5 class="card-title">图片检测</h5>-->
+<!--                        <p class="card-text">上传图片进行井盖检测</p>-->
+<!--                        <a href="/static/image.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">🎥</div>-->
+<!--                        <h5 class="card-title">视频检测</h5>-->
+<!--                        <p class="card-text">上传视频进行井盖检测</p>-->
+<!--                        <a href="/static/video.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <div class="col-md-6 col-lg-3">-->
+<!--                <div class="card feature-card">-->
+<!--                    <div class="card-body text-center">-->
+<!--                        <div class="feature-icon">🤖</div>-->
+<!--                        <h5 class="card-title">视觉大模型检测</h5>-->
+<!--                        <p class="card-text">使用大模型进行图像分析</p>-->
+<!--                        <a href="/static/vision.html" class="btn btn-primary">开始检测</a>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="zh-CN">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>街道井盖隐患监测系统</title>-->
+<!--    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">-->
+<!--    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">-->
+<!--    <style>-->
+<!--        /* 其他原有样式保持不变... */-->
+
+<!--        /* 修改后的用户信息样式 */-->
+<!--        .user-info-container {-->
+<!--            background-color: #e7f5ff;-->
+<!--            padding: 10px 15px;-->
+<!--            border-radius: 20px;-->
+<!--            display: inline-flex;-->
+<!--            align-items: center;-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        .user-avatar {-->
+<!--            width: 30px;-->
+<!--            height: 30px;-->
+<!--            background-color: #4dabf7;-->
+<!--            color: white;-->
+<!--            border-radius: 50%;-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            margin-right: 10px;-->
+<!--        }-->
+<!--        .welcome-text {-->
+<!--            margin-right: 15px;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+<!--        /* 修改退出按钮为蓝色（与"开始检测"一致） */-->
+<!--        .logout-btn {-->
+<!--            background-color: #4CAF50; /* 与开始检测按钮同色 */-->
+<!--            color: white;-->
+<!--            border: none;-->
+<!--            padding: 5px 10px;-->
+<!--            border-radius: 5px;-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color 0.2s;-->
+<!--            text-decoration: none;-->
+<!--            font-size: 14px;-->
+<!--        }-->
+<!--        .logout-btn:hover {-->
+<!--            background-color: #45a049; /* 悬停深绿色 */-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <div class="container mt-5">-->
+<!--        <h1 class="text-center mb-3">街道井盖隐患监测系统</h1>-->
+
+<!--        &lt;!&ndash; 修改后的用户信息模块 &ndash;&gt;-->
+<!--        <div class="d-flex justify-content-center">-->
+<!--            <div class="user-info-container">-->
+<!--                <div class="user-avatar">-->
+<!--                    <i class="bi bi-person-fill"></i>-->
+<!--                </div>-->
+<!--                <span class="welcome-text">欢迎，<span id="username">admin</span>！</span>-->
+<!--                <a href="/static/login.html" class="logout-btn">-->
+<!--                    <i class="bi bi-box-arrow-right"></i> 退出登录-->
+<!--                </a>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; 其他内容保持不变... &ndash;&gt;-->
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        // 动态设置用户名（从localStorage获取）-->
+<!--        document.addEventListener('DOMContentLoaded', function() {-->
+<!--            const username = localStorage.getItem('username') || 'admin'; // 默认显示admin-->
+<!--            document.getElementById('username').textContent = username;-->
+<!--        });-->
+
+<!--        // 退出登录时清除用户名（可选）-->
+<!--        document.querySelector('.logout-btn').addEventListener('click', function() {-->
+<!--            localStorage.removeItem('username');-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>井盖检测系统</title>
+    <title>街道井盖隐患监测系统</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            padding-top: 50px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            /* 新增背景图样式 */
+            background-image: url('/static/images/login-bg.jpg'); /* 背景图片路径 */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+            background-color: rgba(240, 240, 240, 0.8);
+        }
+
+        /* 新增半透明遮罩层 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+
         .preview-image {
             max-width: 100%;
             max-height: 300px;
@@ -84,7 +716,7 @@
         }
         button:disabled {
             background-color: #cccccc;
-            cursor: not-allowed; 
+            cursor: not-allowed;
         }
         .status {
             text-align: center;
@@ -150,43 +782,64 @@
             font-size: 3rem;
             margin-bottom: 1rem;
         }
-        .auth-buttons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
+
+        /* 用户信息模块样式 */
+        .user-info-container {
+            background-color: #e7f5ff;
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        
-        .user-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            background-color: #4dabf7;
+            color: white;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        .welcome-message {
-            color: #333;
+            justify-content: center;
             margin-right: 10px;
+        }
+        .welcome-text {
+            margin-right: 15px;
+            font-weight: 500;
+        }
+        .logout-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div class="auth-buttons" id="authButtons">
-        <a href="/static/login.html" class="btn btn-outline-primary">登录</a>
-        <a href="/static/register.html" class="btn btn-primary">注册</a>
-    </div>
-    
-    <div class="user-info" id="userInfo" style="display: none;">
-        <span class="welcome-message" id="welcomeMessage"></span>
-        <button class="btn btn-outline-danger" onclick="logout()">退出登录</button>
-    </div>
+    <div class="container">
+        <h1 class="text-center mb-3">街道井盖隐患监测系统</h1>
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-5">井盖检测系统</h1>
-        
+        <!-- 用户信息模块 -->
+        <div class="d-flex justify-content-center">
+            <div class="user-info-container">
+                <div class="user-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <span class="welcome-text">欢迎，<span id="username">admin</span>！</span>
+                <a href="/static/login.html" class="logout-btn">
+                    <i class="bi bi-box-arrow-right"></i> 退出登录
+                </a>
+            </div>
+        </div>
+
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
                 <div class="card feature-card">
@@ -198,7 +851,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-6 col-lg-3">
                 <div class="card feature-card">
                     <div class="card-body text-center">
@@ -209,7 +862,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-6 col-lg-3">
                 <div class="card feature-card">
                     <div class="card-body text-center">
@@ -220,7 +873,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-6 col-lg-3">
                 <div class="card feature-card">
                     <div class="card-body text-center">
@@ -235,480 +888,17 @@
     </div>
 
     <script>
-        let ws = null;
-        let stream = null;
-        let isProcessing = false;
-        const inputVideo = document.getElementById('inputVideo');
-        const outputVideo = document.getElementById('outputVideo');
-        const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-        const status = document.getElementById('status');
-        const detectionStats = document.getElementById('detectionStats');
-        
-        // 创建用于显示检测结果的canvas
-        const resultCanvas = document.createElement('canvas');
-        const resultCtx = resultCanvas.getContext('2d');
-        let resultStream = null;
-        
-        // 标签页切换
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                // 移除所有活动标签
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // 激活当前标签
-                tab.classList.add('active');
-                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+        // 动态设置用户名
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从本地存储获取用户名（登录时需要先保存）
+            const username = localStorage.getItem('username') || 'admin';
+            document.getElementById('username').textContent = username;
+
+            // 退出登录时清除用户名
+            document.querySelector('.logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('username');
             });
         });
-
-        // 初始化WebSocket连接
-        function initWebSocket() {
-            ws = new WebSocket('ws://' + window.location.host + '/api/v1/video/ws/video');
-            
-            ws.onopen = () => {
-                status.textContent = '已连接';
-                status.className = 'status connected';
-            };
-            
-            ws.onclose = () => {
-                status.textContent = '未连接';
-                status.className = 'status disconnected';
-                stopProcessing();
-            };
-            
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                if (data.error) {
-                    console.error('WebSocket错误:', data.error);
-                    return;
-                }
-                
-                // 显示检测结果
-                const img = new Image();
-                img.onload = () => {
-                    // 使用requestAnimationFrame来优化渲染性能
-                    requestAnimationFrame(() => {
-                        // 设置canvas尺寸
-                        resultCanvas.width = img.width;
-                        resultCanvas.height = img.height;
-                        
-                        // 绘制图像到canvas
-                        resultCtx.drawImage(img, 0, 0);
-                        
-                        // 更新检测统计
-                        updateDetectionStats(data.detections);
-                    });
-                };
-                img.src = data.frame;
-            };
-        }
-
-        // 更新检测统计
-        function updateDetectionStats(detections) {
-            if (!detections || detections.length === 0) {
-                detectionStats.innerHTML = '<p>未检测到目标</p>';
-                return;
-            }
-            
-            // 统计各类别数量
-            const stats = {};
-            detections.forEach(det => {
-                if (!stats[det.class_name]) {
-                    stats[det.class_name] = {
-                        count: 0,
-                        avgConfidence: 0
-                    };
-                }
-                stats[det.class_name].count++;
-                stats[det.class_name].avgConfidence += det.confidence;
-            });
-            
-            // 计算平均置信度
-            Object.keys(stats).forEach(key => {
-                stats[key].avgConfidence = (stats[key].avgConfidence / stats[key].count).toFixed(2);
-            });
-            
-            // 显示统计信息
-            let html = '';
-            Object.keys(stats).forEach(key => {
-                html += `
-                    <div class="detection-item">
-                        <strong>${key}:</strong> ${stats[key].count} 个
-                        <span class="text-muted">(平均置信度: ${stats[key].avgConfidence})</span>
-                    </div>
-                `;
-            });
-            
-            detectionStats.innerHTML = html;
-        }
-
-        // 开始视频处理
-        async function startProcessing() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                inputVideo.srcObject = stream;
-                
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                isProcessing = true;
-                startButton.disabled = true;
-                stopButton.disabled = false;
-                
-                // 初始化WebSocket
-                initWebSocket();
-                
-                // 设置检测结果视频源
-                resultStream = resultCanvas.captureStream();
-                outputVideo.srcObject = resultStream;
-                
-                // 开始发送视频帧，使用节流来控制发送频率
-                let lastSendTime = 0;
-                const sendInterval = 100; // 每100ms发送一帧
-                
-                function sendFrame() {
-                    if (!isProcessing) return;
-                    
-                    const now = Date.now();
-                    if (now - lastSendTime >= sendInterval) {
-                        canvas.width = inputVideo.videoWidth;
-                        canvas.height = inputVideo.videoHeight;
-                        ctx.drawImage(inputVideo, 0, 0);
-                        
-                        const frame = canvas.toDataURL('image/jpeg', 0.8);
-                        if (ws && ws.readyState === WebSocket.OPEN) {
-                            ws.send(JSON.stringify({ frame }));
-                        }
-                        
-                        lastSendTime = now;
-                    }
-                    
-                    requestAnimationFrame(sendFrame);
-                }
-                
-                sendFrame();
-            } catch (err) {
-                console.error('Error accessing camera:', err);
-                alert('无法访问摄像头，请确保已授予摄像头权限。');
-            }
-        }
-
-        // 停止视频处理
-        function stopProcessing() {
-            isProcessing = false;
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-            if (ws) {
-                ws.close();
-            }
-            if (resultStream) {
-                resultStream.getTracks().forEach(track => track.stop());
-            }
-            startButton.disabled = false;
-            stopButton.disabled = true;
-            inputVideo.srcObject = null;
-            outputVideo.srcObject = null;
-        }
-
-        // 事件监听器
-        startButton.addEventListener('click', startProcessing);
-        stopButton.addEventListener('click', stopProcessing);
-
-        // 更新设置值显示
-        document.getElementById('confidence').addEventListener('input', function(e) {
-            document.getElementById('confidenceValue').textContent = e.target.value;
-        });
-        document.getElementById('iou').addEventListener('input', function(e) {
-            document.getElementById('iouValue').textContent = e.target.value;
-        });
-
-        // 更新设置
-        async function updateSettings() {
-            const settings = {
-                confidence: parseFloat(document.getElementById('confidence').value),
-                iou: parseFloat(document.getElementById('iou').value),
-                device: document.getElementById('device').value,
-                half: document.getElementById('half').checked
-            };
-
-            try {
-                const response = await fetch('/api/v1/settings', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(settings)
-                });
-                
-                if (response.ok) {
-                    alert('设置更新成功');
-                } else {
-                    throw new Error('设置更新失败');
-                }
-            } catch (error) {
-                alert(`更新设置失败: ${error.message}`);
-            }
-        }
-        
-        // 图片检测
-        document.getElementById('detectImageButton').addEventListener('click', async function() {
-            const imageInput = document.getElementById('imageInput');
-            const imageLoading = document.getElementById('imageLoading');
-            const imageResult = document.getElementById('imageResult');
-            
-            if (!imageInput.files || imageInput.files.length === 0) {
-                alert('请选择图片文件');
-                return;
-            }
-            
-            const file = imageInput.files[0];
-            if (!file.type.startsWith('image/')) {
-                alert('请选择有效的图片文件');
-                return;
-            }
-            
-            // 显示加载中
-            imageLoading.style.display = 'block';
-            imageResult.innerHTML = '<p>正在处理图片...</p>';
-            
-            // 创建FormData对象
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            try {
-                const response = await fetch('/api/v1/detect/image', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    throw new Error('图片检测失败');
-                }
-                
-                const result = await response.json();
-                
-                // 显示检测结果
-                let html = `
-                    <div class="image-container">
-                        <img src="/uploads/${result.result_image}" class="preview-image">
-                    </div>
-                    <div class="detection-info">
-                        <h4>检测结果</h4>
-                        <ul>
-                `;
-                
-                if (result.detections && result.detections.length > 0) {
-                    result.detections.forEach(det => {
-                        html += `<li>${det.class_name}: 置信度 ${det.confidence.toFixed(2)}</li>`;
-                    });
-                } else {
-                    html += '<li>未检测到目标</li>';
-                }
-                
-                html += '</ul></div>';
-                imageResult.innerHTML = html;
-            } catch (error) {
-                imageResult.innerHTML = `<p class="text-danger">错误: ${error.message}</p>`;
-            } finally {
-                imageLoading.style.display = 'none';
-            }
-        });
-        
-        // 视频检测
-        document.getElementById('detectVideoButton').addEventListener('click', async function() {
-            const videoInput = document.getElementById('videoInput');
-            const videoLoading = document.getElementById('videoLoading');
-            const videoResult = document.getElementById('videoResult');
-            
-            if (!videoInput.files || videoInput.files.length === 0) {
-                alert('请选择视频文件');
-                return;
-            }
-            
-            const file = videoInput.files[0];
-            if (!file.type.startsWith('video/')) {
-                alert('请选择有效的视频文件');
-                return;
-            }
-            
-            // 显示加载中
-            videoLoading.style.display = 'block';
-            videoResult.innerHTML = '<p>正在处理视频...</p>';
-            
-            try {
-                // 使用WebSocket方式处理视频
-                const ws = new WebSocket('ws://' + window.location.host + '/api/v1/video/ws/upload');
-                
-                ws.onopen = async () => {
-                    // 读取视频文件并发送
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const arrayBuffer = e.target.result;
-                        ws.send(arrayBuffer);
-                    };
-                    reader.readAsArrayBuffer(file);
-                };
-                
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    
-                    if (data.error) {
-                        videoResult.innerHTML = `<p class="text-danger">错误: ${data.error}</p>`;
-                        videoLoading.style.display = 'none';
-                        return;
-                    }
-                    
-                    if (data.info) {
-                        // 接收视频信息
-                        videoResult.innerHTML = `
-                            <h4>视频信息</h4>
-                            <p>帧率: ${data.info.fps.toFixed(2)} FPS</p>
-                            <p>总帧数: ${data.info.frame_count}</p>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                            </div>
-                            <div id="videoFrameContainer">
-                                <img id="videoFrame" style="max-width: 100%; border-radius: 5px;">
-                            </div>
-                            <div id="videoDetections" class="detection-stats mt-3">
-                                <h4>检测统计</h4>
-                                <div id="videoDetectionStats"></div>
-                            </div>
-                        `;
-                    } else if (data.frame) {
-                        // 更新视频帧
-                        const videoFrame = document.getElementById('videoFrame');
-                        videoFrame.src = data.frame;
-                        
-                        // 更新进度条
-                        const progressBar = document.querySelector('.progress-bar');
-                        const progress = Math.round(data.progress * 100);
-                        progressBar.style.width = `${progress}%`;
-                        progressBar.textContent = `${progress}%`;
-                        
-                        // 更新检测统计
-                        updateVideoDetectionStats(data.detections);
-                    } else if (data.status === 'completed') {
-                        // 处理完成
-                        videoLoading.style.display = 'none';
-                        videoResult.innerHTML += `
-                            <div class="alert alert-success mt-3">
-                                ${data.message}
-                            </div>
-                        `;
-                    }
-                };
-                
-                ws.onerror = (error) => {
-                    console.error('WebSocket错误:', error);
-                    videoResult.innerHTML = `<p class="text-danger">WebSocket连接错误</p>`;
-                    videoLoading.style.display = 'none';
-                };
-                
-                ws.onclose = () => {
-                    console.log('WebSocket连接已关闭');
-                };
-            } catch (error) {
-                videoResult.innerHTML = `<p class="text-danger">错误: ${error.message}</p>`;
-                videoLoading.style.display = 'none';
-            }
-        });
-        
-        // 更新视频检测统计
-        function updateVideoDetectionStats(detections) {
-            const videoDetectionStats = document.getElementById('videoDetectionStats');
-            
-            if (!detections || detections.length === 0) {
-                videoDetectionStats.innerHTML = '<p>未检测到目标</p>';
-                return;
-            }
-            
-            // 统计各类别数量
-            const stats = {};
-            detections.forEach(det => {
-                if (!stats[det.class_name]) {
-                    stats[det.class_name] = {
-                        count: 0,
-                        avgConfidence: 0
-                    };
-                }
-                stats[det.class_name].count++;
-                stats[det.class_name].avgConfidence += det.confidence;
-            });
-            
-            // 计算平均置信度
-            Object.keys(stats).forEach(key => {
-                stats[key].avgConfidence = (stats[key].avgConfidence / stats[key].count).toFixed(2);
-            });
-            
-            // 显示统计信息
-            let html = '';
-            Object.keys(stats).forEach(key => {
-                html += `
-                    <div class="detection-item">
-                        <strong>${key}:</strong> ${stats[key].count} 个
-                        <span class="text-muted">(平均置信度: ${stats[key].avgConfidence})</span>
-                    </div>
-                `;
-            });
-            
-            videoDetectionStats.innerHTML = html;
-        }
-
-        // 检查用户是否已登录
-        async function checkAuth() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                // 未登录，显示登录注册按钮
-                document.getElementById('authButtons').style.display = 'flex';
-                document.getElementById('userInfo').style.display = 'none';
-                // 隐藏需要登录才能访问的内容
-                document.querySelectorAll('.feature-card').forEach(card => {
-                    card.style.display = 'none';
-                });
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/v1/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const user = await response.json();
-                    // 已登录，显示用户信息和功能卡片
-                    document.getElementById('authButtons').style.display = 'none';
-                    document.getElementById('userInfo').style.display = 'flex';
-                    document.getElementById('welcomeMessage').textContent = `欢迎，${user.username}`;
-                    document.querySelectorAll('.feature-card').forEach(card => {
-                        card.style.display = 'block';
-                    });
-                } else {
-                    // token 无效，清除并重定向到登录页
-                    localStorage.removeItem('token');
-                    window.location.href = '/static/login.html';
-                }
-            } catch (error) {
-                console.error('验证失败:', error);
-                localStorage.removeItem('token');
-                window.location.href = '/static/login.html';
-            }
-        }
-
-        // 退出登录
-        function logout() {
-            localStorage.removeItem('token');
-            window.location.href = '/static/login.html';
-        }
-
-        // 页面加载时检查登录状态
-        document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>
-</html> 
+</html>

@@ -7,6 +7,9 @@ import base64
 from ..core.config import settings
 import datetime
 
+
+settings.MODEL_PATH = r'D:\code\manhole-cover\app\core\best.pt'
+
 class YOLODetector:
     def __init__(self):
         self.model = YOLO(settings.MODEL_PATH)
