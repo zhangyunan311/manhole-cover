@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频检测 - 井盖检测系统</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎥</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .video-container video {
+            width: 100%;
+            max-height: 400px;
+            background-color: #000;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .stats-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .back-button {
+            margin-bottom: 20px;
+            background-color: #6c757d;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-connected {
+            background-color: #28a745;
+        }
+        .status-disconnected {
+            background-color: #dc3545;
+        }
+        .detection-controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .detection-controls button {
+            margin: 0 10px;
+        }
+        .progress {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <a href="/static/index.html" class="btn back-button">返回首页</a>
+        <h1 class="text-center mb-4">视频检测</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>上传视频</h3>
+                <div class="mb-3">
+                    <input type="file" class="form-control" id="videoInput" accept="video/*">
+                </div>
+                <button id="detectVideoButton" class="btn btn-primary">检测视频</button>
+                <div class="loading" id="videoLoading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">加载中...</span>
+                    </div>
+                    <p>正在处理视频...</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3>检测结果</h3>
+                <div id="videoResult" class="result-container">
+                    <p class="text-muted">请上传视频并点击检测按钮</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="stats-container">
+                    <h4>检测统计</h4>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>检测目标数: <span id="detectionCount">0</span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>平均置信度: <span id="avgConfidence">0.00</span></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>处理帧率: <span id="fps">0</span> FPS</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>连接状态: 
+                                <span class="status-indicator status-disconnected" id="statusIndicator"></span>
+                                <span id="statusText">未连接</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">检测设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="confidence" class="form-label">置信度阈值</label>
+                                    <input type="range" class="form-range" id="confidence" min="0" max="1" step="0.1" value="0.5">
+                                    <span id="confidenceValue">0.5</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="iou" class="form-label">IOU阈值</label>
+                                    <input type="range" class="form-range" id="iou" min="0" max="1" step="0.1" value="0.5">
+                                    <span id="iouValue">0.5</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="device" class="form-label">设备</label>
+                                    <select class="form-select" id="device">
+                                        <option value="cpu">CPU</option>
+                                        <option value="cuda">GPU</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="half" checked>
+                                        <label class="form-check-label" for="half">
+                                            使用半精度
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="updateSettings()">更新设置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let lastUpdateTime = 0;
+        let frameCount = 0;
+        let fps = 0;
+        let isProcessing = false;
+
+        // 更新设置值显示
+        document.getElementById('confidence').addEventListener('input', function(e) {
+            document.getElementById('confidenceValue').textContent = e.target.value;
+        });
+        document.getElementById('iou').addEventListener('input', function(e) {
+            document.getElementById('iouValue').textContent = e.target.value;
+        });
+
+        // 更新设置
+        async function updateSettings() {
+            const settings = {
+                confidence: parseFloat(document.getElementById('confidence').value),
+                iou: parseFloat(document.getElementById('iou').value),
+                device: document.getElementById('device').value,
+                half: document.getElementById('half').checked
+            };
+
+            try {
+                const response = await fetch('/api/v1/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                if (response.ok) {
+                    alert('设置更新成功');
+                } else {
+                    throw new Error('设置更新失败');
+                }
+            } catch (error) {
+                alert(`更新设置失败: ${error.message}`);
+            }
+        }
+
+        // 连接WebSocket
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/video`);
+            
+            ws.onopen = function() {
+                document.getElementById('statusIndicator').classList.remove('status-disconnected');
+                document.getElementById('statusIndicator').classList.add('status-connected');
+                document.getElementById('statusText').textContent = '已连接';
+            };
+            
+            ws.onclose = function() {
+                document.getElementById('statusIndicator').classList.remove('status-connected');
+                document.getElementById('statusIndicator').classList.add('status-disconnected');
+                document.getElementById('statusText').textContent = '未连接';
+                if (isProcessing) {
+                    setTimeout(connectWebSocket, 3000);
+                }
+            };
+            
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                // 更新FPS
+                frameCount++;
+                const now = Date.now();
+                if (now - lastUpdateTime >= 1000) {
+                    fps = frameCount;
+                    frameCount = 0;
+                    lastUpdateTime = now;
+                    document.getElementById('fps').textContent = fps;
+                }
+                
+                // 更新检测统计
+                if (data.detections) {
+                    document.getElementById('detectionCount').textContent = data.detections.length;
+                    const avgConfidence = data.detections.reduce((sum, det) => sum + det.confidence, 0) / data.detections.length;
+                    document.getElementById('avgConfidence').textContent = avgConfidence.toFixed(2);
+                }
+                
+                // 更新视频帧
+                if (data.frame) {
+                    const videoFrame = document.getElementById('videoFrame');
+                    if (videoFrame) {
+                        videoFrame.src = data.frame;
+                    }
+                }
+            };
+        }
+
+        // 开始检测
+        function startDetection() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                isProcessing = true;
+                document.getElementById('detectVideoButton').disabled = true;
+                ws.send(JSON.stringify({ action: 'start' }));
+            }
+        }
+
+        // 停止检测
+        function stopDetection() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                isProcessing = false;
+                document.getElementById('detectVideoButton').disabled = false;
+                ws.send(JSON.stringify({ action: 'stop' }));
+            }
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoInput = document.getElementById('videoInput');
+            const detectVideoButton = document.getElementById('detectVideoButton');
+            const videoLoading = document.getElementById('videoLoading');
+            const videoResult = document.getElementById('videoResult');
+            
+            detectVideoButton.addEventListener('click', async function() {
+                if (!videoInput.files || videoInput.files.length === 0) {
+                    alert('请选择视频文件');
+                    return;
+                }
+                
+                const file = videoInput.files[0];
+                if (!file.type.startsWith('video/')) {
+                    alert('请选择有效的视频文件');
+                    return;
+                }
+                
+                // 显示加载中
+                videoLoading.style.display = 'block';
+                videoResult.innerHTML = '<p>正在处理视频...</p>';
+                
+                try {
+                    // 使用WebSocket方式处理视频
+                    const ws = new WebSocket('ws://' + window.location.host + '/api/v1/video/ws/upload');
+                    
+                    ws.onopen = async () => {
+                        // 读取视频文件并发送
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const arrayBuffer = e.target.result;
+                            ws.send(arrayBuffer);
+                        };
+                        reader.readAsArrayBuffer(file);
+                    };
+                    
+                    ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        
+                        if (data.error) {
+                            videoResult.innerHTML = `<p class="text-danger">错误: ${data.error}</p>`;
+                            videoLoading.style.display = 'none';
+                            return;
+                        }
+                        
+                        if (data.info) {
+                            // 接收视频信息
+                            videoResult.innerHTML = `
+                                <h4>视频信息</h4>
+                                <p>帧率: ${data.info.fps.toFixed(2)} FPS</p>
+                                <p>总帧数: ${data.info.frame_count}</p>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div id="videoFrameContainer">
+                                    <img id="videoFrame" style="max-width: 100%; border-radius: 5px;">
+                                </div>
+                                <div id="videoDetections" class="detection-stats mt-3">
+                                    <h4>检测统计</h4>
+                                    <div id="videoDetectionStats"></div>
+                                </div>
+                            `;
+                        } else if (data.frame) {
+                            // 更新视频帧
+                            const videoFrame = document.getElementById('videoFrame');
+                            videoFrame.src = data.frame;
+                            
+                            // 更新进度条
+                            const progressBar = document.querySelector('.progress-bar');
+                            const progress = Math.round(data.progress * 100);
+                            progressBar.style.width = `${progress}%`;
+                            progressBar.textContent = `${progress}%`;
+                            
+                            // 更新检测统计
+                            updateVideoDetectionStats(data.detections);
+                        } else if (data.status === 'completed') {
+                            // 处理完成
+                            videoLoading.style.display = 'none';
+                            videoResult.innerHTML += `
+                                <div class="alert alert-success mt-3">
+                                    ${data.message}
+                                </div>
+                            `;
+                        }
+                    };
+                    
+                    ws.onerror = (error) => {
+                        console.error('WebSocket错误:', error);
+                        videoResult.innerHTML = `<p class="text-danger">WebSocket连接错误</p>`;
+                        videoLoading.style.display = 'none';
+                    };
+                    
+                    ws.onclose = () => {
+                        console.log('WebSocket连接已关闭');
+                    };
+                } catch (error) {
+                    videoResult.innerHTML = `<p class="text-danger">错误: ${error.message}</p>`;
+                    videoLoading.style.display = 'none';
+                }
+            });
+        });
+
+        // 更新视频检测统计
+        function updateVideoDetectionStats(detections) {
+            const videoDetectionStats = document.getElementById('videoDetectionStats');
+            
+            if (!detections || detections.length === 0) {
+                videoDetectionStats.innerHTML = '<p>未检测到目标</p>';
+                return;
+            }
+            
+            // 统计各类别数量
+            const stats = {};
+            detections.forEach(det => {
+                if (!stats[det.class_name]) {
+                    stats[det.class_name] = {
+                        count: 0,
+                        avgConfidence: 0
+                    };
+                }
+                stats[det.class_name].count++;
+                stats[det.class_name].avgConfidence += det.confidence;
+            });
+            
+            // 计算平均置信度
+            Object.keys(stats).forEach(key => {
+                stats[key].avgConfidence = (stats[key].avgConfidence / stats[key].count).toFixed(2);
+            });
+            
+            // 显示统计信息
+            let html = '';
+            Object.keys(stats).forEach(key => {
+                html += `
+                    <div class="detection-item">
+                        <strong>${key}:</strong> ${stats[key].count} 个
+                        <span class="text-muted">(平均置信度: ${stats[key].avgConfidence})</span>
+                    </div>
+                `;
+            });
+            
+            videoDetectionStats.innerHTML = html;
+        }
+    </script>
+</body>
+</html> 
